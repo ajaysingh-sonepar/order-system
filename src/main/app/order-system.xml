@@ -12,9 +12,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8086" doc:name="HTTP Listener Configuration"/>
     <ws:consumer-config name="Web_Service_Consumer" service="OrderServiceService" port="OrderServicePort" serviceAddress="http://training-u.cloudhub.io/advanced/orders" wsdlLocation="orders.wsdl" doc:name="Web Service Consumer"/>
-   
-    <flow name="retrieveOrders">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+    <sub-flow name="retrieveOrders">
         <set-variable variableName="dateRange" value="#[message.inboundProperties.'http.query.params'.range]" doc:name="Variable"/>
         <parse-template location="orderRequest.xml" doc:name="Parse Template"/>
         <ws:consumer config-ref="Web_Service_Consumer" operation="provisionOrder" doc:name="Web Service Consumer"/>
@@ -25,7 +23,12 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 ---
 payload.ns0#provisionOrderResponse.*return]]></dw:set-payload>
         </dw:transform-message>
-        <logger level="INFO" doc:name="Logger"/>
+    </sub-flow>
+   
+    <flow name="main">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        <flow-ref name="retrieveOrders" doc:name="retrieveOrders"/>
+        <flow-ref name="processOrders" doc:name="Flow Reference"/>
     </flow>
     <flow name="processOrders">
         <set-variable variableName="orders" value="#[payload]" doc:name="Variable"/>
