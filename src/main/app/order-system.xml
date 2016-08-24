@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     <sub-flow name="retrieveOrders">
         <set-variable variableName="dateRange" value="#[message.inboundProperties.'http.query.params'.range]" doc:name="Variable"/>
         <parse-template location="orderRequest.xml" doc:name="Parse Template"/>
-        <ws:consumer config-ref="Web_Service_Consumer" operation="provisionOrder" doc:name="Web Service Consumer"/>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="provisionOrder" doc:name="MyWebServiceConsumer"/>
         <dw:transform-message doc:name="Transform Message">
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
